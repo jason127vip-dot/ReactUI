@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Form, Input, Modal, Select } from 'antd'
-import { Customer, CustomerFormValues, CustomerSource, CustomerStatus } from '../types'
+import { Customer, CustomerFormValues, CustomerStatus } from '../types'
 
 export interface CustomerFormProps {
   mode: 'create' | 'edit'
@@ -11,18 +11,8 @@ export interface CustomerFormProps {
 }
 
 const statusOptions = [
-  { label: 'Prospect', value: CustomerStatus.Prospect },
-  { label: 'In Progress', value: CustomerStatus.InProgress },
   { label: 'Active', value: CustomerStatus.Active },
-  { label: 'Churned', value: CustomerStatus.Churned },
-]
-
-const sourceOptions = [
-  { label: 'Website', value: CustomerSource.Website },
-  { label: 'Referral', value: CustomerSource.Referral },
-  { label: 'Ads', value: CustomerSource.Ads },
-  { label: 'Partner', value: CustomerSource.Partner },
-  { label: 'Other', value: CustomerSource.Other },
+  { label: 'Inactive', value: CustomerStatus.Inactive },
 ]
 
 const CustomerForm = ({ mode, open, initialValues, onSubmit, onCancel }: CustomerFormProps) => {
@@ -32,14 +22,14 @@ const CustomerForm = ({ mode, open, initialValues, onSubmit, onCancel }: Custome
   useEffect(() => {
     if (open) {
       form.setFieldsValue({
+        customerCode: initialValues?.customerCode,
         name: initialValues?.name,
-        email: initialValues?.email,
+        contactPerson: initialValues?.contactPerson,
         phone: initialValues?.phone,
-        company: initialValues?.company,
-        position: initialValues?.position,
-        source: initialValues?.source ?? CustomerSource.Website,
-        status: initialValues?.status ?? CustomerStatus.Prospect,
-        owner: initialValues?.owner,
+        email: initialValues?.email,
+        address: initialValues?.address,
+        paymentTerms: initialValues?.paymentTerms,
+        status: initialValues?.status ?? CustomerStatus.Active,
         notes: initialValues?.notes,
       })
     } else {
@@ -59,53 +49,52 @@ const CustomerForm = ({ mode, open, initialValues, onSubmit, onCancel }: Custome
 
   return (
     <Modal
-      title={mode === 'create' ? 'Create Customer' : 'Edit Customer'}
+      title={mode === 'create' ? 'New Customer' : 'Edit Customer'}
       open={open}
-      onCancel={() => {
-        if (!submitting) onCancel()
-      }}
+      onCancel={() => !submitting && onCancel()}
       onOk={() => form.submit()}
       confirmLoading={submitting}
       destroyOnHidden
     >
       <Form form={form} layout="vertical" onFinish={handleFinish}>
         <Form.Item
-          name="name"
-          label="Name / Company"
-          rules={[{ required: true, message: 'Please enter a name' }]}
+          name="customerCode"
+          label="Customer Code"
+          rules={[{ required: true, message: 'Please enter a customer code' }]}
         >
-          <Input placeholder="e.g. Acme Corp" />
+          <Input placeholder="e.g. CUS-1001" />
         </Form.Item>
         <Form.Item
-          name="email"
-          label="Email"
-          rules={[
-            { required: true, message: 'Please enter an email' },
-            { type: 'email', message: 'Please enter a valid email' },
-          ]}
+          name="name"
+          label="Customer Name"
+          rules={[{ required: true, message: 'Please enter a customer name' }]}
         >
-          <Input placeholder="contact@example.com" />
+          <Input placeholder="e.g. Acme Corporation" />
+        </Form.Item>
+        <Form.Item
+          name="contactPerson"
+          label="Contact Person"
+          rules={[{ required: true, message: 'Please enter a contact person' }]}
+        >
+          <Input placeholder="e.g. Alex Chen" />
         </Form.Item>
         <Form.Item name="phone" label="Phone">
-          <Input placeholder="+1 415 000 0000" />
+          <Input placeholder="Phone number" />
         </Form.Item>
-        <Form.Item name="company" label="Company">
-          <Input placeholder="Company name" />
+        <Form.Item name="email" label="Email" rules={[{ type: 'email', message: 'Please enter a valid email' }]}>
+          <Input placeholder="contact@example.com" />
         </Form.Item>
-        <Form.Item name="position" label="Title">
-          <Input placeholder="Title" />
+        <Form.Item name="address" label="Address">
+          <Input.TextArea rows={2} placeholder="Customer address" />
         </Form.Item>
-        <Form.Item name="source" label="Source" rules={[{ required: true }]}>
-          <Select options={sourceOptions} />
+        <Form.Item name="paymentTerms" label="Payment Terms">
+          <Input placeholder="e.g. Net 30" />
         </Form.Item>
         <Form.Item name="status" label="Status" rules={[{ required: true }]}>
           <Select options={statusOptions} />
         </Form.Item>
-        <Form.Item name="owner" label="Customer Success Owner">
-          <Input placeholder="e.g. Iris Chen" />
-        </Form.Item>
         <Form.Item name="notes" label="Notes">
-          <Input.TextArea rows={3} placeholder="Additional context or follow-up plan" />
+          <Input.TextArea rows={3} placeholder="Additional customer information" />
         </Form.Item>
       </Form>
     </Modal>
@@ -113,4 +102,3 @@ const CustomerForm = ({ mode, open, initialValues, onSubmit, onCancel }: Custome
 }
 
 export default CustomerForm
-

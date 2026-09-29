@@ -111,7 +111,7 @@ const Headerbar = (props: HeaderbarProps) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}>
-            {isMobile ? 'Dashboard' : 'Sales Management System (Brunton)'}
+            {isMobile ? 'Dashboard' : 'Sales Management System (Brunton ERP)'}
           </h2>
         </div>
         <div style={{ 

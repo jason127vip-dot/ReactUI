@@ -1,7 +1,8 @@
 export enum CustomerStatus {
+  Active = 'active',
+  Inactive = 'inactive',
   Prospect = 'prospect',
   InProgress = 'in_progress',
-  Active = 'active',
   Churned = 'churned',
 }
 
@@ -15,13 +16,15 @@ export enum CustomerSource {
 
 export interface Customer {
   id: string
+  customerCode: string
   name: string
-  email: string
+  contactPerson: string
   phone?: string
-  company?: string
-  position?: string
-  source: CustomerSource
+  email?: string
+  address?: string
+  paymentTerms?: string
   status: CustomerStatus
+  source: CustomerSource
   owner?: string
   lifetimeValue?: number
   monthlyRecurringRevenue?: number
@@ -43,20 +46,16 @@ export interface CustomerActivity {
 export interface CustomerFilters {
   keyword?: string
   status?: CustomerStatus[]
-  source?: CustomerSource[]
-  owner?: string
-  dateRange?: [string, string]
 }
 
 export interface CustomerFormValues {
+  customerCode: string
   name: string
-  email: string
+  contactPerson: string
   phone?: string
-  company?: string
-  position?: string
-  source: CustomerSource
+  email?: string
+  address?: string
+  paymentTerms?: string
   status: CustomerStatus
-  owner?: string
   notes?: string
 }
-

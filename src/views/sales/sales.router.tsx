@@ -11,14 +11,11 @@ import type { AdminRouterItem } from '../../router'
 import LazyRoute from '../../components/common/LazyRoute'
 
 const CustomersPage = lazy(() => import('../customers'))
-const PlaceholderPage = lazy(() => import('.'))
-
-const placeholder = (title: string) => (
-  <LazyRoute>
-    <PlaceholderPage title={title} />
-  </LazyRoute>
-)
-
+const ProductsPage = lazy(() => import('../products'))
+const SalesOrdersPage = lazy(() => import('../sales-orders'))
+const SalesOutboundPage = lazy(() => import('../sales-outbound'))
+const PaymentsPage = lazy(() => import('../payments'))
+const SalesOrderPaymentReportPage = lazy(() => import('../sales-order-payment-report'))
 const salesRoutes: AdminRouterItem[] = [
   {
     path: 'sales',
@@ -32,7 +29,11 @@ const salesRoutes: AdminRouterItem[] = [
     children: [
       {
         path: 'sales-orders',
-        element: placeholder('Sales Orders'),
+        element: (
+          <LazyRoute>
+            <SalesOrdersPage />
+          </LazyRoute>
+        ),
         meta: {
           label: 'Sales Orders',
           title: 'Sales Orders',
@@ -42,17 +43,25 @@ const salesRoutes: AdminRouterItem[] = [
       },
       {
         path: 'deliveries',
-        element: placeholder('Deliveries'),
+        element: (
+          <LazyRoute>
+            <SalesOutboundPage />
+          </LazyRoute>
+        ),
         meta: {
-          label: 'Deliveries',
-          title: 'Deliveries',
+          label: 'Sales Outbound',
+          title: 'Sales Outbound',
           key: '/sales/deliveries',
           icon: <InboxOutlined />,
         },
       },
       {
         path: 'payments',
-        element: placeholder('Payments'),
+        element: (
+          <LazyRoute>
+            <PaymentsPage />
+          </LazyRoute>
+        ),
         meta: {
           label: 'Payments',
           title: 'Payments',
@@ -87,7 +96,11 @@ const salesRoutes: AdminRouterItem[] = [
       },
       {
         path: 'products',
-        element: placeholder('Products'),
+        element: (
+          <LazyRoute>
+            <ProductsPage />
+          </LazyRoute>
+        ),
         meta: {
           label: 'Products',
           title: 'Products',
@@ -107,12 +120,16 @@ const salesRoutes: AdminRouterItem[] = [
     },
     children: [
       {
-        path: 'outstanding-receivables',
-        element: placeholder('Outstanding Receivables'),
+        path: 'sales-order-payment-report',
+        element: (
+          <LazyRoute>
+            <SalesOrderPaymentReportPage />
+          </LazyRoute>
+        ),
         meta: {
-          label: 'Outstanding Receivables',
-          title: 'Outstanding Receivables',
-          key: '/reports/outstanding-receivables',
+          label: 'Sales Order Payment Report',
+          title: 'Sales Order Payment Report',
+          key: '/reports/sales-order-payment-report',
         },
       },
     ],

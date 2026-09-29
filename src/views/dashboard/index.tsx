@@ -6,6 +6,7 @@ import { getDashboardStats } from '../../utils/mockData'
 import { CustomerStatus } from '../customers/types'
 
 const statusLabelMap: Record<CustomerStatus, string> = {
+  [CustomerStatus.Inactive]: 'Inactive',
   [CustomerStatus.Prospect]: 'Prospect',
   [CustomerStatus.InProgress]: 'In Progress',
   [CustomerStatus.Active]: 'Active',
@@ -13,6 +14,7 @@ const statusLabelMap: Record<CustomerStatus, string> = {
 }
 
 const statusColorMap: Record<CustomerStatus, string> = {
+  [CustomerStatus.Inactive]: 'default',
   [CustomerStatus.Prospect]: 'default',
   [CustomerStatus.InProgress]: 'processing',
   [CustomerStatus.Active]: 'success',
@@ -114,6 +116,9 @@ const CustomerSourceBreakdown = ({
   )
 }
 
+void RevenueTrendChart
+void CustomerSourceBreakdown
+
 const DashboardPage = () => {
   const [stats, setStats] = useState<DashboardStats>()
   const [loading, setLoading] = useState(true)
@@ -144,32 +149,32 @@ const DashboardPage = () => {
 
   const metricCards = useMemo(() => ([
     {
-      title: 'Total Customers',
-      value: stats?.totalCustomers ?? 0,
-      suffix: 'customers',
+      title: 'Total Sales',
+      value: stats?.totalSales ?? 0,
+      prefix: '¥',
       icon: <TeamOutlined style={{ color: '#1890ff' }} />,
-      trend: '+12% MoM',
+      trend: 'Confirmed orders',
     },
     {
-      title: 'New Customers (Monthly)',
-      value: stats?.newCustomers ?? 0,
-      suffix: 'customers',
+      title: 'Received Amount',
+      value: stats?.receivedAmount ?? 0,
+      prefix: '¥',
       icon: <ArrowUpOutlined style={{ color: '#52c41a' }} />,
-      trend: '+8% YoY',
+      trend: 'Confirmed payments',
     },
     {
-      title: 'MRR',
-      value: stats?.monthlyRecurringRevenue ?? 0,
+      title: 'Unpaid Amount',
+      value: stats?.unpaidAmount ?? 0,
       prefix: '¥',
       icon: <FireOutlined style={{ color: '#fa8c16' }} />,
-      trend: '+5.6% QoQ',
+      trend: 'Confirmed orders less payments',
     },
     {
-      title: 'Active Deals',
-      value: stats?.activeDeals ?? 0,
-      suffix: 'deals',
+      title: 'Confirmed Outbound Qty',
+      value: stats?.outboundQuantity ?? 0,
+      suffix: 'items',
       icon: <ArrowUpOutlined style={{ color: '#722ed1' }} />,
-      trend: '72% win rate',
+      trend: 'Confirmed sales outbound',
     },
   ]), [stats])
 
@@ -219,29 +224,8 @@ const DashboardPage = () => {
       </Row>
 
       <Row gutter={[16, 16]}>
-        <Col xs={24} lg={16}>
-          <Card title="Revenue Trend" extra={<Typography.Text type="secondary">Last 6 months</Typography.Text>}>
-            {stats ? (
-              <RevenueTrendChart data={stats.revenueTrend} token={token} />
-            ) : (
-              <Skeleton active />
-            )}
-          </Card>
-        </Col>
-        <Col xs={24} lg={8}>
-          <Card title="Customer Sources">
-            {stats ? (
-              <CustomerSourceBreakdown data={stats.sourceDistribution} token={token} />
-            ) : (
-              <Skeleton active />
-            )}
-          </Card>
-        </Col>
-      </Row>
-
-      <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
-          <Card title="Recent Activity">
+          <Card title="Recent Sales Orders">
             <List
               dataSource={stats?.recentActivities ?? []}
               locale={{ emptyText: 'No recent activity yet.' }}
@@ -264,27 +248,15 @@ const DashboardPage = () => {
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title="Health Insights">
+          <Card title="Outstanding Customers">
             <List
-              dataSource={[
-                {
-                  title: 'Follow-up Reminder',
-                  description: 'Four prospects have been idle for over 7 days. Reach out soon to improve conversion.',
-                },
-                {
-                  title: 'Expansion Opportunity',
-                  description: 'Atlas Logistics active usage grew 32%. Consider pitching an upgraded plan.',
-                },
-                {
-                  title: 'Renewal Alert',
-                  description: 'Two enterprise contracts expire within 30 days. Prepare renewal strategies.',
-                },
-              ]}
+              dataSource={stats?.outstandingCustomers ?? []}
+              locale={{ emptyText: 'No outstanding customers.' }}
               renderItem={item => (
                 <List.Item>
                   <List.Item.Meta
-                    title={<Typography.Text strong>{item.title}</Typography.Text>}
-                    description={item.description}
+                    title={<Typography.Text strong>{item.name}</Typography.Text>}
+                    description={`Unpaid Amount: ¥${item.amount.toLocaleString()}`}
                   />
                 </List.Item>
               )}
