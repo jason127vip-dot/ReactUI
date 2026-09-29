@@ -22,6 +22,7 @@ const teamRoutes: AdminRouterItem[] = [
       key: '/team',
       icon: <TeamOutlined />,
       order: 3,
+      hideInMenu: true,
     },
     children: [
       {
@@ -50,7 +51,7 @@ const teamRoutes: AdminRouterItem[] = [
           title: 'Role Detail',
           key: '/team/role/:roleId',
           icon: <SettingOutlined />,
-          hideInMenu: true,
+            hideInMenu: true,
         },
       },
       {
@@ -65,7 +66,7 @@ const teamRoutes: AdminRouterItem[] = [
           title: 'Role Permissions',
           key: '/team/role/:roleId/permissions',
           icon: <SettingOutlined />,
-          hideInMenu: true,
+            hideInMenu: true,
         },
       },
     ],

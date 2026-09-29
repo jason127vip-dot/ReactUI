@@ -19,6 +19,7 @@ const customersRoutes: AdminRouterItem[] = [
       key: '/customers',
       icon: <TeamOutlined />,
       order: 2,
+      hideInMenu: true,
     },
   },
 ]

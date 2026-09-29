@@ -75,7 +75,7 @@ const Headerbar = (props: HeaderbarProps) => {
 
   return (
     <Header 
-      title='Sales Management System' 
+      title='Sales Management System Brunton' 
       style={{ 
         padding: 0, 
         background: colorBgContainer,
@@ -111,7 +111,7 @@ const Headerbar = (props: HeaderbarProps) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}>
-            {isMobile ? 'Dashboard' : 'Sales Management System'}
+            {isMobile ? 'Dashboard' : 'Sales Management System (Brunton)'}
           </h2>
         </div>
         <div style={{ 
