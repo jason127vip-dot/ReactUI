@@ -75,7 +75,7 @@ const Headerbar = (props: HeaderbarProps) => {
 
   return (
     <Header 
-      title='React Admin Dashboard' 
+      title='Sales Management System' 
       style={{ 
         padding: 0, 
         background: colorBgContainer,
@@ -111,7 +111,7 @@ const Headerbar = (props: HeaderbarProps) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}>
-            {isMobile ? 'Dashboard' : 'React Admin Dashboard'}
+            {isMobile ? 'Dashboard' : 'Sales Management System'}
           </h2>
         </div>
         <div style={{ 
