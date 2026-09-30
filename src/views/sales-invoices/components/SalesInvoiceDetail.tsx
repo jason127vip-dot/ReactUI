@@ -28,9 +28,9 @@ const printInvoice = (invoice: SalesInvoice) => {
   const body = append('tbody', '', table)
   for (const line of invoice.lines) {
     const row = append('tr', '', body)
-    for (const value of [line.productCode, [line.productName, line.specification].filter(Boolean).join(' / '), line.unit, String(line.quantity), `¥${line.unitPrice.toFixed(2)}`, `¥${line.amount.toFixed(2)}`]) append('td', value, row)
+    for (const value of [line.productCode, [line.productName, line.specification].filter(Boolean).join(' / '), line.unit, String(line.quantity), `$${line.unitPrice.toFixed(2)}`, `$${line.amount.toFixed(2)}`]) append('td', value, row)
   }
-  append('p', `Total: ¥${invoice.totalAmount.toFixed(2)}`).className = 'total'
+  append('p', `Total: $${invoice.totalAmount.toFixed(2)}`).className = 'total'
   if (invoice.remarks) append('p', `Remarks: ${invoice.remarks}`)
   const button = append('button', 'Print / Save as PDF')
   button.onclick = () => preview.print()
@@ -55,10 +55,10 @@ const SalesInvoiceDetail = ({ invoice, onClose }: { invoice: SalesInvoice; onClo
     <Table rowKey="id" dataSource={invoice.lines} pagination={false} scroll={{ x: 650 }} columns={[
       { title: 'Code', dataIndex: 'productCode' }, { title: 'Product', dataIndex: 'productName' }, { title: 'Specification', dataIndex: 'specification' },
       { title: 'Unit', dataIndex: 'unit' }, { title: 'Quantity', dataIndex: 'quantity' },
-      { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `¥${value.toFixed(2)}` },
-      { title: 'Amount', dataIndex: 'amount', render: value => `¥${value.toFixed(2)}` },
+      { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `$${value.toFixed(2)}` },
+      { title: 'Amount', dataIndex: 'amount', render: value => `$${value.toFixed(2)}` },
     ]} />
-    <Typography.Text strong>Total: ¥{invoice.totalAmount.toFixed(2)} · Paid: ¥{invoice.paidAmount.toFixed(2)} · Unpaid: ¥{invoice.unpaidAmount.toFixed(2)}</Typography.Text>
+    <Typography.Text strong>Total: ${invoice.totalAmount.toFixed(2)} · Paid: ${invoice.paidAmount.toFixed(2)} · Unpaid: ${invoice.unpaidAmount.toFixed(2)}</Typography.Text>
   </Space>
 </Drawer>
 

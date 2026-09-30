@@ -96,7 +96,7 @@ const ProductsPage = () => {
     { title: 'Product Name', dataIndex: 'name' },
     { title: 'Specification', dataIndex: 'specification', render: value => value || '-' },
     { title: 'Unit', dataIndex: 'unit' },
-    { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `¥${value.toLocaleString()}` },
+    { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `$${value.toLocaleString()}` },
     { title: 'Status', dataIndex: 'status', render: (status: ProductStatus) => <Tag color={statusColorMap[status]}>{status}</Tag> },
     {
       title: 'Actions',

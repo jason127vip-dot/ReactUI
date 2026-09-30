@@ -83,7 +83,7 @@ const ProductForm = ({ mode, open, initialValues, onSubmit, onCancel }: ProductF
           label="Unit Price"
           rules={[{ required: true, message: 'Please enter a unit price' }]}
         >
-          <InputNumber min={0} precision={2} prefix="¥" style={{ width: '100%' }} />
+          <InputNumber min={0} precision={2} prefix="$" style={{ width: '100%' }} />
         </Form.Item>
         <Form.Item name="status" label="Status" rules={[{ required: true }]}>
           <Select options={statusOptions} />

@@ -430,7 +430,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
       customerId: order.customerId,
       actor: order.customerName,
       type: 'deal' as const,
-      summary: `${order.orderNo} · ¥${order.totalAmount.toLocaleString()} · ${order.status}`,
+      summary: `${order.orderNo} · $${order.totalAmount.toLocaleString()} · ${order.status}`,
       timestamp: order.createdAt,
     })),
   }

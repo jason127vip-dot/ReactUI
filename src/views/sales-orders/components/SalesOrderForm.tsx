@@ -186,13 +186,13 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
       ),
     },
     { title: 'Unit', dataIndex: 'unit' },
-    { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `¥${value.toLocaleString()}` },
+    { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `$${value.toLocaleString()}` },
     {
       title: 'Quantity',
       dataIndex: 'quantity',
       render: (quantity, line) => <InputNumber min={1} value={quantity} onChange={value => updateQuantity(line.id, value)} />,
     },
-    { title: 'Amount', dataIndex: 'amount', render: value => `¥${value.toLocaleString()}` },
+    { title: 'Amount', dataIndex: 'amount', render: value => `$${value.toLocaleString()}` },
     {
       title: 'Actions',
       render: (_value, line) => (
@@ -293,7 +293,7 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
           locale={{ emptyText: 'Scan a barcode or enter a product code to add an item.' }}
         />
         <Typography.Text strong style={{ alignSelf: 'flex-end', fontSize: 16 }}>
-          Total: ¥{totalAmount.toLocaleString()}
+          Total: ${totalAmount.toLocaleString()}
         </Typography.Text>
       </Space>
     </Modal>

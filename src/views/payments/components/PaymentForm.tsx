@@ -55,13 +55,13 @@ const PaymentForm = ({ mode, open, initialPayment, onCancel, onSubmit }: Payment
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <Select showSearch optionFilterProp="label" placeholder="Select confirmed invoice" value={invoiceId} onChange={selectInvoice} disabled={mode === 'edit' && !!initialPayment?.salesInvoiceId} options={invoices.map(order => ({ label: `${order.invoiceNo} · ${order.orderNo} · ${order.customerName}`, value: order.id }))} />
         {selectedInvoice && <Descriptions bordered column={1} size="small">
-          <Descriptions.Item label="Invoice Amount">¥{selectedInvoice.invoiceAmount.toLocaleString()}</Descriptions.Item>
-          <Descriptions.Item label="Paid Amount">¥{selectedInvoice.paidAmount.toLocaleString()}</Descriptions.Item>
-          <Descriptions.Item label="Unpaid Amount">¥{selectedInvoice.unpaidAmount.toLocaleString()}</Descriptions.Item>
+          <Descriptions.Item label="Invoice Amount">${selectedInvoice.invoiceAmount.toLocaleString()}</Descriptions.Item>
+          <Descriptions.Item label="Paid Amount">${selectedInvoice.paidAmount.toLocaleString()}</Descriptions.Item>
+          <Descriptions.Item label="Unpaid Amount">${selectedInvoice.unpaidAmount.toLocaleString()}</Descriptions.Item>
         </Descriptions>}
         {!!selectedInvoice?.legacyPaidAmount && <Alert type="warning" showIcon title="Legacy payments need allocation" description="Cancel confirmation of the existing order payments and assign each to an invoice before confirming invoice payments." />}
         <DatePicker value={date} onChange={value => setDate(value ?? dayjs())} />
-        <InputNumber min={0.01} max={selectedInvoice?.unpaidAmount} precision={2} prefix="¥" placeholder="Payment amount" value={amount} onChange={value => setAmount(value ?? undefined)} style={{ width: '100%' }} />
+        <InputNumber min={0.01} max={selectedInvoice?.unpaidAmount} precision={2} prefix="$" placeholder="Payment amount" value={amount} onChange={value => setAmount(value ?? undefined)} style={{ width: '100%' }} />
         <Select value={method} onChange={setMethod} options={['Bank Transfer', 'Cash', 'Card', 'Cheque'].map(value => ({ label: value, value }))} />
         <Input placeholder="Reference No. (optional)" value={referenceNo} onChange={event => setReferenceNo(event.target.value)} />
       </Space>

@@ -33,7 +33,7 @@ const SalesOrderPaymentReportPage = () => {
 
   const columns: ColumnsType<SalesOrderPaymentReportRow> = [
     { title: 'Order No.', dataIndex: 'orderNo' }, { title: 'Customer', dataIndex: 'customerName' }, { title: 'Order Date', dataIndex: 'orderDate' },
-    { title: 'Order Amount', dataIndex: 'orderAmount', render: value => `¥${value.toLocaleString()}` }, { title: 'Paid Amount', dataIndex: 'paidAmount', render: value => `¥${value.toLocaleString()}` }, { title: 'Unpaid Amount', dataIndex: 'unpaidAmount', render: value => `¥${value.toLocaleString()}` },
+    { title: 'Order Amount', dataIndex: 'orderAmount', render: value => `$${value.toLocaleString()}` }, { title: 'Paid Amount', dataIndex: 'paidAmount', render: value => `$${value.toLocaleString()}` }, { title: 'Unpaid Amount', dataIndex: 'unpaidAmount', render: value => `$${value.toLocaleString()}` },
     { title: 'Last Payment Date', dataIndex: 'lastPaymentDate', render: value => value || '-' }, { title: 'Payment Status', dataIndex: 'paymentStatus', render: (status: SalesOrderPaymentStatus) => <Tag color={statusColorMap[status]}>{status}</Tag> },
   ]
 

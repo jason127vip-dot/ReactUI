@@ -54,10 +54,10 @@ const SalesInvoiceForm = ({ invoice, onCancel, onSubmit }: Props) => {
       <Table rowKey="id" dataSource={lines} pagination={false} scroll={{ x: 650 }} columns={[
         { title: 'Product Code', dataIndex: 'productCode' }, { title: 'Product', dataIndex: 'productName' },
         { title: 'Unit', dataIndex: 'unit' }, { title: 'Quantity', dataIndex: 'quantity' },
-        { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `¥${value.toFixed(2)}` },
-        { title: 'Amount', dataIndex: 'amount', render: value => `¥${value.toFixed(2)}` },
+        { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `$${value.toFixed(2)}` },
+        { title: 'Amount', dataIndex: 'amount', render: value => `$${value.toFixed(2)}` },
       ]} />
-      <Typography.Paragraph strong style={{ textAlign: 'right', marginTop: 16 }}>Total: ¥{lines.reduce((sum, line) => sum + line.amount, 0).toFixed(2)}</Typography.Paragraph>
+      <Typography.Paragraph strong style={{ textAlign: 'right', marginTop: 16 }}>Total: ${lines.reduce((sum, line) => sum + line.amount, 0).toFixed(2)}</Typography.Paragraph>
       <Form.Item label="Remarks"><Input.TextArea maxLength={1000} value={remarks} onChange={event => setRemarks(event.target.value)} /></Form.Item>
     </Form>
   </Modal>

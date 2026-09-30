@@ -31,7 +31,7 @@ const SalesOrderDetail = ({ order, open, onClose }: SalesOrderDetailProps) => (
           <Descriptions.Item label="Order No.">{order.orderNo}</Descriptions.Item>
           <Descriptions.Item label="Order Date">{order.orderDate}</Descriptions.Item>
           <Descriptions.Item label="Customer">{order.customerName}</Descriptions.Item>
-          <Descriptions.Item label="Total Amount">¥{order.totalAmount.toLocaleString()}</Descriptions.Item>
+          <Descriptions.Item label="Total Amount">${order.totalAmount.toLocaleString()}</Descriptions.Item>
           <Descriptions.Item label="Customer PO No.">{order.customerPoNo || '-'}</Descriptions.Item>
           <Descriptions.Item label="Expected Outbound Date">{order.expectedOutboundDate || '-'}</Descriptions.Item>
           <Descriptions.Item label="Salesperson">{order.salesperson || '-'}</Descriptions.Item>
@@ -46,8 +46,8 @@ const SalesOrderDetail = ({ order, open, onClose }: SalesOrderDetailProps) => (
               {executionStatusLabel(order.paymentStatus)}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Paid Amount">¥{(order.paidAmount ?? 0).toLocaleString()}</Descriptions.Item>
-          <Descriptions.Item label="Unpaid Amount">¥{(order.unpaidAmount ?? order.totalAmount).toLocaleString()}</Descriptions.Item>
+          <Descriptions.Item label="Paid Amount">${(order.paidAmount ?? 0).toLocaleString()}</Descriptions.Item>
+          <Descriptions.Item label="Unpaid Amount">${(order.unpaidAmount ?? order.totalAmount).toLocaleString()}</Descriptions.Item>
           <Descriptions.Item label="Remarks" span={2}>{order.remarks || '-'}</Descriptions.Item>
         </Descriptions>
         <Table
@@ -58,9 +58,9 @@ const SalesOrderDetail = ({ order, open, onClose }: SalesOrderDetailProps) => (
             { title: 'Product Code', dataIndex: 'productCode' },
             { title: 'Product Name', dataIndex: 'productName' },
             { title: 'Unit', dataIndex: 'unit' },
-            { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `¥${value.toLocaleString()}` },
+            { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `$${value.toLocaleString()}` },
             { title: 'Quantity', dataIndex: 'quantity' },
-            { title: 'Amount', dataIndex: 'amount', render: value => `¥${value.toLocaleString()}` },
+            { title: 'Amount', dataIndex: 'amount', render: value => `$${value.toLocaleString()}` },
           ]}
         />
       </>

@@ -28,7 +28,7 @@ const ProductDetail = ({ product, open, onClose }: ProductDetailProps) => (
         <Descriptions.Item label="Product Name">{product.name}</Descriptions.Item>
         <Descriptions.Item label="Specification">{product.specification || '-'}</Descriptions.Item>
         <Descriptions.Item label="Unit">{product.unit}</Descriptions.Item>
-        <Descriptions.Item label="Unit Price">¥{product.unitPrice.toLocaleString()}</Descriptions.Item>
+        <Descriptions.Item label="Unit Price">${product.unitPrice.toLocaleString()}</Descriptions.Item>
         <Descriptions.Item label="Created At">{new Date(product.createdAt).toLocaleString()}</Descriptions.Item>
         {product.updatedAt && (
           <Descriptions.Item label="Last Updated">{new Date(product.updatedAt).toLocaleString()}</Descriptions.Item>

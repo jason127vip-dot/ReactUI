@@ -48,9 +48,9 @@ const SalesInvoicesPage = () => {
     { title: 'Sales Order', render: (_, row) => row.salesOrder.orderNo },
     { title: 'Customer', dataIndex: 'customerName' },
     { title: 'Invoice Date', dataIndex: 'invoiceDate', render: value => value.slice(0, 10) },
-    { title: 'Amount', dataIndex: 'totalAmount', render: value => `¥${value.toFixed(2)}` },
-    { title: 'Paid', dataIndex: 'paidAmount', render: value => `¥${value.toFixed(2)}` },
-    { title: 'Unpaid', dataIndex: 'unpaidAmount', render: value => `¥${value.toFixed(2)}` },
+    { title: 'Amount', dataIndex: 'totalAmount', render: value => `$${value.toFixed(2)}` },
+    { title: 'Paid', dataIndex: 'paidAmount', render: value => `$${value.toFixed(2)}` },
+    { title: 'Unpaid', dataIndex: 'unpaidAmount', render: value => `$${value.toFixed(2)}` },
     { title: 'Status', dataIndex: 'status', render: value => <Tag color={value === 'confirmed' ? 'processing' : 'default'}>{value}</Tag> },
     { title: 'Actions', render: (_, row) => <Space size={0} wrap>
       <Button type="link" onClick={() => setSelected(row)}>View / Print</Button>

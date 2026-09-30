@@ -12,7 +12,7 @@ import { getDashboardStats } from '../../services/analyticsApi'
 
 type AntdToken = ReturnType<typeof theme.useToken>['token']
 
-const formatCurrency = (value: number) => `¥${value.toLocaleString('en-NZ', { maximumFractionDigits: 2 })}`
+const formatCurrency = (value: number) => `$${value.toLocaleString('en-NZ', { maximumFractionDigits: 2 })}`
 
 const formatStatus = (status: string) => status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' ')
 
@@ -115,7 +115,7 @@ const DashboardPage = () => {
     {
       title: 'Total Sales',
       value: stats?.totalSales ?? 0,
-      prefix: '¥',
+      prefix: '$',
       icon: <ShoppingCartOutlined />,
       color: token.colorInfo,
       background: token.colorInfoBg,
@@ -124,7 +124,7 @@ const DashboardPage = () => {
     {
       title: 'Received Amount',
       value: stats?.receivedAmount ?? 0,
-      prefix: '¥',
+      prefix: '$',
       icon: <DollarOutlined />,
       color: token.colorSuccess,
       background: token.colorSuccessBg,
@@ -133,7 +133,7 @@ const DashboardPage = () => {
     {
       title: 'Unpaid Amount',
       value: stats?.unpaidAmount ?? 0,
-      prefix: '¥',
+      prefix: '$',
       icon: <CreditCardOutlined />,
       color: token.colorWarning,
       background: token.colorWarningBg,

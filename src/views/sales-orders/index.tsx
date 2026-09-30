@@ -129,7 +129,7 @@ const SalesOrdersPage = () => {
     { title: 'Customer', dataIndex: 'customerName', width: 125 },
     { title: 'Order Date', dataIndex: 'orderDate', width: 120 },
     { title: 'Total Qty', dataIndex: 'totalQuantity', width: 75, render: (value, order) => value ?? order.lines.reduce((sum, line) => sum + line.quantity, 0) },
-    { title: 'Total Amount', dataIndex: 'totalAmount', width: 105, render: value => `¥${value.toLocaleString()}` },
+    { title: 'Total Amount', dataIndex: 'totalAmount', width: 105, render: value => `$${value.toLocaleString()}` },
     { title: 'Status', dataIndex: 'status', width: 85, render: (status: SalesOrderStatus) => <Tag color={statusColorMap[status]}>{status}</Tag> },
     {
       title: 'Outbound',
@@ -154,8 +154,8 @@ const SalesOrdersPage = () => {
       width: 125,
       render: (_value, order) => (
         <Space direction="vertical" size={0}>
-          <span>Paid: ¥{(order.paidAmount ?? 0).toLocaleString()}</span>
-          <span>Unpaid: ¥{(order.unpaidAmount ?? order.totalAmount).toLocaleString()}</span>
+          <span>Paid: ${(order.paidAmount ?? 0).toLocaleString()}</span>
+          <span>Unpaid: ${(order.unpaidAmount ?? order.totalAmount).toLocaleString()}</span>
         </Space>
       ),
     },
