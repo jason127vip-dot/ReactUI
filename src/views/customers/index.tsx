@@ -17,7 +17,7 @@ import {
 import type { ColumnsType } from 'antd/es/table'
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import { Customer, CustomerFilters, CustomerStatus } from './types'
-import { createCustomer, deleteCustomer, getCustomers, updateCustomer } from '../../utils/mockData'
+import { createCustomer, deleteCustomer, getCustomers, updateCustomer } from '../../services/masterDataApi'
 import CustomerForm from './components/CustomerForm'
 import CustomerDetail from './components/CustomerDetail'
 

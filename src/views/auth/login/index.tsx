@@ -115,16 +115,16 @@ const LoginPage: React.FC = () => {
 
   return (
     <div style={backgroundStyle}>
-      <Card
-        style={{
-          width: 400,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        }}
-      >
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%', padding: 16 }}>
+        <Card
+          style={{
+            width: 'min(600px, 100%)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          }}
+        >
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <div style={{ textAlign: 'center' }}>
-            <Title level={2}>Login</Title>
-            <Text type="secondary">Welcome back, please login to your account</Text>
+            <Title level={2}>Sales Management System</Title>
           </div>
 
           <Form
@@ -219,7 +219,13 @@ const LoginPage: React.FC = () => {
             </Text>
           </div>
         </Space>
-      </Card>
+        </Card>
+        <img
+          src="/brunton-partners.png"
+          alt="Brunton business partners"
+          style={{ width: 'min(600px, 100%)', height: 'auto', display: 'block', borderRadius: 6 }}
+        />
+      </div>
     </div>
   )
 }

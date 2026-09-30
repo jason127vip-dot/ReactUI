@@ -6,8 +6,6 @@ import PageContent from './contentbar';
 import PageBreadcrumb from './breadcrumb';
 import Headerbar from './headerbar';
 
-const { Footer } = Layout;
-
 // Custom hook for responsive breakpoints
 const useResponsive = () => {
   const [isMobile, setIsMobile] = useState(false)
@@ -61,9 +59,18 @@ const PageLayout: React.FC = () => {
         }}>
           <PageBreadcrumb />
           <PageContent></PageContent>
-          <Footer style={{ textAlign: 'center', padding: '16px' }}>
-            React Admin Dashboard ©{new Date().getFullYear()} Created by Yujian Xue
-          </Footer>
+          <Layout.Footer style={{ padding: '12px 20px 16px', textAlign: 'center', position: 'relative' }}>
+            <img
+              src="/brunton-partners.png"
+              alt="Brunton business partners"
+              style={{ width: 'min(520px, 90%)', height: 'auto', display: 'block', margin: '0 auto' }}
+            />
+            <div style={isMobile
+              ? { marginTop: 8, color: 'rgba(0, 0, 0, 0.45)', fontSize: 13 }
+              : { position: 'absolute', right: 20, bottom: 16, color: 'rgba(0, 0, 0, 0.45)', fontSize: 13 }}>
+              Developed by Jin
+            </div>
+          </Layout.Footer>
         </Layout>
       </Layout>
     </Layout>

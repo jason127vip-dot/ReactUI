@@ -1,25 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ArrowUpOutlined, FireOutlined, ReloadOutlined, TeamOutlined } from '@ant-design/icons'
-import { Alert, Button, Card, Col, Empty, List, Row, Skeleton, Space, Statistic, Tag, Typography, theme } from 'antd'
-import type { DashboardStats } from '../../utils/mockData'
-import { getDashboardStats } from '../../utils/mockData'
-import { CustomerStatus } from '../customers/types'
-
-const statusLabelMap: Record<CustomerStatus, string> = {
-  [CustomerStatus.Inactive]: 'Inactive',
-  [CustomerStatus.Prospect]: 'Prospect',
-  [CustomerStatus.InProgress]: 'In Progress',
-  [CustomerStatus.Active]: 'Active',
-  [CustomerStatus.Churned]: 'Churned',
-}
-
-const statusColorMap: Record<CustomerStatus, string> = {
-  [CustomerStatus.Inactive]: 'default',
-  [CustomerStatus.Prospect]: 'default',
-  [CustomerStatus.InProgress]: 'processing',
-  [CustomerStatus.Active]: 'success',
-  [CustomerStatus.Churned]: 'error',
-}
+import { Alert, Button, Card, Col, Empty, List, Row, Skeleton, Space, Statistic, Typography, theme } from 'antd'
+import type { DashboardStats } from '../../services/analyticsApi'
+import { getDashboardStats } from '../../services/analyticsApi'
 
 type AntdToken = ReturnType<typeof theme.useToken>['token']
 
@@ -235,9 +218,6 @@ const DashboardPage = () => {
                     title={
                       <Space>
                         <Typography.Text strong>{activity.summary}</Typography.Text>
-                        {activity.statusAfter && (
-                          <Tag color={statusColorMap[activity.statusAfter]}>{statusLabelMap[activity.statusAfter]}</Tag>
-                        )}
                       </Space>
                     }
                     description={`${activity.actor} · ${new Date(activity.timestamp).toLocaleString()}`}

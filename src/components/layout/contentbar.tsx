@@ -28,7 +28,7 @@ const PageContent: React.FC = () => {
   return (
     <div style={{ 
       padding: isMobile ? "12px" : isTablet ? "16px" : "20px", 
-      minHeight: "calc(100vh - 200px)",
+      flex: 1,
     }}>
       <Card style={{ 
         minHeight: "100%",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Alert, Drawer, Skeleton, Space, Table, Tag, Typography } from 'antd'
-import { getSalesOrderExecution } from '../../../utils/mockData'
+import { getSalesOrderExecution } from '../../../services/salesDocumentApi'
 import { Payment, PaymentStatus } from '../../payments/types'
 import { SalesOutbound, SalesOutboundStatus } from '../../sales-outbound/types'
 import { SalesOrder } from '../types'

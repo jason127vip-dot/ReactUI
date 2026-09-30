@@ -15,7 +15,7 @@ import {
 } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons'
-import { createProduct, deleteProduct, getProducts, updateProduct } from '../../utils/mockData'
+import { createProduct, deleteProduct, getProducts, updateProduct } from '../../services/masterDataApi'
 import ProductDetail from './components/ProductDetail'
 import ProductForm from './components/ProductForm'
 import { Product, ProductFilters, ProductStatus } from './types'

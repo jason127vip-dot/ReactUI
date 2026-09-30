@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
-import { Alert, Button, Card, Empty, Popconfirm, Space, Table, Tag, message } from 'antd'
+import { useEffect, useMemo, useState } from 'react'
+import { Alert, Button, Card, DatePicker, Empty, Input, Popconfirm, Select, Space, Table, Tag, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import type { Dayjs } from 'dayjs'
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import {
   cancelSalesOrderConfirmation,
@@ -9,16 +10,33 @@ import {
   deleteSalesOrder,
   getSalesOrders,
   updateSalesOrder,
-} from '../../utils/mockData'
+} from '../../services/salesOrderApi'
 import SalesOrderDetail from './components/SalesOrderDetail'
 import SalesOrderExecution from './components/SalesOrderExecution'
 import SalesOrderForm from './components/SalesOrderForm'
-import { SalesOrder, SalesOrderStatus } from './types'
+import {
+  SalesOrder,
+  SalesOrderOutboundStatus,
+  SalesOrderPaymentStatus,
+  SalesOrderStatus,
+} from './types'
 
 const statusColorMap: Record<SalesOrderStatus, string> = {
   [SalesOrderStatus.Draft]: 'default',
   [SalesOrderStatus.Confirmed]: 'processing',
 }
+
+const outboundStatusOptions = {
+  not_outbound: { label: 'Not Outbound', color: 'default' },
+  partially_outbound: { label: 'Partially Outbound', color: 'warning' },
+  fully_outbound: { label: 'Fully Outbound', color: 'success' },
+} as const
+
+const paymentStatusOptions = {
+  unpaid: { label: 'Unpaid', color: 'default' },
+  partially_paid: { label: 'Partially Paid', color: 'warning' },
+  paid: { label: 'Paid', color: 'success' },
+} as const
 
 const SalesOrdersPage = () => {
   const [orders, setOrders] = useState<SalesOrder[]>([])
@@ -30,6 +48,9 @@ const SalesOrdersPage = () => {
   const [detailVisible, setDetailVisible] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<SalesOrder>()
   const [executionVisible, setExecutionVisible] = useState(false)
+  const [keyword, setKeyword] = useState('')
+  const [statusFilter, setStatusFilter] = useState<SalesOrderStatus>()
+  const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null)
 
   const loadOrders = async () => {
     setLoading(true)
@@ -47,6 +68,22 @@ const SalesOrdersPage = () => {
   useEffect(() => {
     loadOrders()
   }, [])
+
+  const filteredOrders = useMemo(() => {
+    const normalizedKeyword = keyword.trim().toLowerCase()
+    return orders.filter(order => {
+      const matchesKeyword = !normalizedKeyword || [
+        order.orderNo,
+        order.customerName,
+        order.customerPoNo,
+        order.salesperson,
+      ].some(value => value?.toLowerCase().includes(normalizedKeyword))
+      const matchesStatus = !statusFilter || order.status === statusFilter
+      const matchesStartDate = !dateRange?.[0] || order.orderDate >= dateRange[0].format('YYYY-MM-DD')
+      const matchesEndDate = !dateRange?.[1] || order.orderDate <= dateRange[1].format('YYYY-MM-DD')
+      return matchesKeyword && matchesStatus && matchesStartDate && matchesEndDate
+    })
+  }, [dateRange, keyword, orders, statusFilter])
 
   const openCreateForm = () => {
     setFormMode('create')
@@ -88,17 +125,47 @@ const SalesOrdersPage = () => {
   }
 
   const columns: ColumnsType<SalesOrder> = [
-    { title: 'Order No.', dataIndex: 'orderNo' },
-    { title: 'Customer', dataIndex: 'customerName' },
-    { title: 'Order Date', dataIndex: 'orderDate' },
-    { title: 'Total Amount', dataIndex: 'totalAmount', render: value => `¥${value.toLocaleString()}` },
-    { title: 'Status', dataIndex: 'status', render: (status: SalesOrderStatus) => <Tag color={statusColorMap[status]}>{status}</Tag> },
+    { title: 'Order No.', dataIndex: 'orderNo', width: 130 },
+    { title: 'Customer', dataIndex: 'customerName', width: 125 },
+    { title: 'Order Date', dataIndex: 'orderDate', width: 120 },
+    { title: 'Total Qty', dataIndex: 'totalQuantity', width: 75, render: (value, order) => value ?? order.lines.reduce((sum, line) => sum + line.quantity, 0) },
+    { title: 'Total Amount', dataIndex: 'totalAmount', width: 105, render: value => `¥${value.toLocaleString()}` },
+    { title: 'Status', dataIndex: 'status', width: 85, render: (status: SalesOrderStatus) => <Tag color={statusColorMap[status]}>{status}</Tag> },
+    {
+      title: 'Outbound',
+      dataIndex: 'outboundStatus',
+      width: 120,
+      render: (status?: SalesOrderOutboundStatus) => {
+        const option = outboundStatusOptions[status ?? 'not_outbound']
+        return <Tag color={option.color}>{option.label}</Tag>
+      },
+    },
+    {
+      title: 'Payment',
+      dataIndex: 'paymentStatus',
+      width: 110,
+      render: (status?: SalesOrderPaymentStatus) => {
+        const option = paymentStatusOptions[status ?? 'unpaid']
+        return <Tag color={option.color}>{option.label}</Tag>
+      },
+    },
+    {
+      title: 'Paid / Unpaid',
+      width: 125,
+      render: (_value, order) => (
+        <Space direction="vertical" size={0}>
+          <span>Paid: ¥{(order.paidAmount ?? 0).toLocaleString()}</span>
+          <span>Unpaid: ¥{(order.unpaidAmount ?? order.totalAmount).toLocaleString()}</span>
+        </Space>
+      ),
+    },
     {
       title: 'Actions',
       key: 'actions',
+      width: 255,
       render: (_value, order) => (
-        <Space>
-          <Button type="link" onClick={() => {
+        <Space size={0}>
+          <Button type="link" style={{ paddingInline: 8 }} onClick={() => {
             setSelectedOrder(order)
             setDetailVisible(true)
           }}>
@@ -106,7 +173,7 @@ const SalesOrdersPage = () => {
           </Button>
           {order.status === SalesOrderStatus.Draft && (
             <>
-              <Button type="link" onClick={() => {
+              <Button type="link" style={{ paddingInline: 8 }} onClick={() => {
                 setFormMode('edit')
                 setEditingOrder(order)
                 setFormVisible(true)
@@ -120,7 +187,7 @@ const SalesOrdersPage = () => {
                 cancelText="Cancel"
                 onConfirm={() => handleConfirm(order)}
               >
-                <Button type="link">Confirm</Button>
+                <Button type="link" style={{ paddingInline: 8 }}>Confirm</Button>
               </Popconfirm>
               <Popconfirm
                 title="Delete this sales order?"
@@ -130,13 +197,13 @@ const SalesOrdersPage = () => {
                 okButtonProps={{ danger: true }}
                 onConfirm={() => handleDelete(order)}
               >
-                <Button type="link" danger>Delete</Button>
+                <Button type="link" danger style={{ paddingInline: 8 }}>Delete</Button>
               </Popconfirm>
             </>
           )}
           {order.status === SalesOrderStatus.Confirmed && (
             <>
-              <Button type="link" onClick={() => { setSelectedOrder(order); setExecutionVisible(true) }}>Execution</Button>
+              <Button type="link" style={{ paddingInline: 8 }} onClick={() => { setSelectedOrder(order); setExecutionVisible(true) }}>Execution</Button>
               <Popconfirm
                 title="Cancel order confirmation?"
                 description="The order will return to Draft and can be edited again."
@@ -144,7 +211,7 @@ const SalesOrdersPage = () => {
                 cancelText="Keep confirmed"
                 onConfirm={() => handleCancelConfirmation(order)}
               >
-                <Button type="link">Cancel Confirmation</Button>
+                <Button type="link" style={{ paddingInline: 8 }}>Cancel Confirmation</Button>
               </Popconfirm>
             </>
           )}
@@ -160,6 +227,34 @@ const SalesOrdersPage = () => {
         extra={<Button type="primary" icon={<PlusOutlined />} onClick={openCreateForm}>New Sales Order</Button>}
       >
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Space wrap>
+            <Input.Search
+              allowClear
+              placeholder="Order no., customer, PO no. or salesperson"
+              value={keyword}
+              onChange={event => setKeyword(event.target.value)}
+              style={{ width: 340 }}
+            />
+            <Select
+              allowClear
+              placeholder="Confirmation status"
+              value={statusFilter}
+              onChange={setStatusFilter}
+              style={{ width: 180 }}
+              options={[
+                { label: 'Draft', value: SalesOrderStatus.Draft },
+                { label: 'Confirmed', value: SalesOrderStatus.Confirmed },
+              ]}
+            />
+            <DatePicker.RangePicker value={dateRange} onChange={value => setDateRange(value)} />
+            <Button onClick={() => {
+              setKeyword('')
+              setStatusFilter(undefined)
+              setDateRange(null)
+            }}>
+              Reset
+            </Button>
+          </Space>
           {error && (
             <Alert
               type="error"
@@ -172,7 +267,8 @@ const SalesOrdersPage = () => {
             rowKey="id"
             loading={loading}
             columns={columns}
-            dataSource={orders}
+            dataSource={filteredOrders}
+            tableLayout="fixed"
             pagination={{ pageSize: 10, showSizeChanger: true }}
             locale={{
               emptyText: (

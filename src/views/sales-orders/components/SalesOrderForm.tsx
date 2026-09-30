@@ -3,17 +3,17 @@ import { Button, DatePicker, Input, InputNumber, Modal, Select, Space, Table, Ty
 import { DeleteOutlined, ScanOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs, { Dayjs } from 'dayjs'
-import { getCustomers, getProductByCodeOrBarcode, getProducts } from '../../../utils/mockData'
+import { getCustomers, getProducts } from '../../../services/masterDataApi'
 import { Customer, CustomerStatus } from '../../customers/types'
 import { Product, ProductStatus } from '../../products/types'
-import { SalesOrder, SalesOrderLine } from '../types'
+import { SalesOrder, SalesOrderFormValues, SalesOrderLine } from '../types'
 
 interface SalesOrderFormProps {
   mode: 'create' | 'edit'
   open: boolean
   initialOrder?: SalesOrder
   onCancel: () => void
-  onSubmit: (values: { customerId: string; orderDate: string; lines: SalesOrderLine[] }) => Promise<void> | void
+  onSubmit: (values: SalesOrderFormValues) => Promise<void> | void
 }
 
 const productToLine = (product: Product): SalesOrderLine => ({
@@ -33,6 +33,10 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
   const [customers, setCustomers] = useState<Customer[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [customerId, setCustomerId] = useState<string>()
+  const [customerPoNo, setCustomerPoNo] = useState('')
+  const [expectedOutboundDate, setExpectedOutboundDate] = useState<Dayjs | null>(null)
+  const [salesperson, setSalesperson] = useState('')
+  const [remarks, setRemarks] = useState('')
   const [selectedProductId, setSelectedProductId] = useState<string>()
   const [orderDate, setOrderDate] = useState<Dayjs>(dayjs())
   const [scanValue, setScanValue] = useState('')
@@ -63,6 +67,10 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
     if (!open) return
     setCustomerId(initialOrder?.customerId)
     setOrderDate(initialOrder ? dayjs(initialOrder.orderDate) : dayjs())
+    setCustomerPoNo(initialOrder?.customerPoNo ?? '')
+    setExpectedOutboundDate(initialOrder?.expectedOutboundDate ? dayjs(initialOrder.expectedOutboundDate) : null)
+    setSalesperson(initialOrder?.salesperson ?? '')
+    setRemarks(initialOrder?.remarks ?? '')
     setSelectedProductId(undefined)
     setScanValue('')
     setLines(initialOrder?.lines ?? [])
@@ -70,6 +78,10 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
 
   const reset = () => {
     setCustomerId(undefined)
+    setCustomerPoNo('')
+    setExpectedOutboundDate(null)
+    setSalesperson('')
+    setRemarks('')
     setSelectedProductId(undefined)
     setOrderDate(dayjs())
     setScanValue('')
@@ -93,7 +105,11 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
 
     setLookingUpProduct(true)
     try {
-      const product = await getProductByCodeOrBarcode(value)
+      const normalized = value.toLowerCase()
+      const product = products.find(item =>
+        item.status === ProductStatus.Active &&
+        (item.productCode.toLowerCase() === normalized || item.barcode?.toLowerCase() === normalized),
+      )
       if (!product) {
         message.warning(`No active product matches "${value}".`)
         return
@@ -144,7 +160,15 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
 
     setSubmitting(true)
     try {
-      await onSubmit({ customerId, orderDate: orderDate.format('YYYY-MM-DD'), lines })
+      await onSubmit({
+        customerId,
+        orderDate: orderDate.format('YYYY-MM-DD'),
+        customerPoNo: customerPoNo.trim() || undefined,
+        expectedOutboundDate: expectedOutboundDate?.format('YYYY-MM-DD'),
+        salesperson: salesperson.trim() || undefined,
+        remarks: remarks.trim() || undefined,
+        lines,
+      })
       reset()
     } finally {
       setSubmitting(false)
@@ -191,7 +215,7 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
       destroyOnHidden
     >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        <Space wrap>
+        <Space wrap style={{ width: '100%' }}>
           <Select
             showSearch
             optionFilterProp="label"
@@ -203,7 +227,35 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
             options={customers.map(customer => ({ label: `${customer.customerCode} · ${customer.name}`, value: customer.id }))}
           />
           <DatePicker value={orderDate} onChange={value => setOrderDate(value ?? dayjs())} />
+          <Input
+            placeholder="Customer PO No."
+            value={customerPoNo}
+            onChange={event => setCustomerPoNo(event.target.value)}
+            style={{ width: 220 }}
+            maxLength={100}
+          />
+          <DatePicker
+            placeholder="Expected outbound date"
+            value={expectedOutboundDate}
+            onChange={setExpectedOutboundDate}
+          />
+          <Input
+            placeholder="Salesperson"
+            value={salesperson}
+            onChange={event => setSalesperson(event.target.value)}
+            style={{ width: 220 }}
+            maxLength={100}
+          />
         </Space>
+
+        <Input.TextArea
+          placeholder="Remarks"
+          value={remarks}
+          onChange={event => setRemarks(event.target.value)}
+          maxLength={1000}
+          autoSize={{ minRows: 2, maxRows: 4 }}
+          showCount
+        />
 
         <Input
           prefix={<ScanOutlined />}

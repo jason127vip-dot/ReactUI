@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, Input, Select, Space, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { ReloadOutlined } from '@ant-design/icons'
-import { getSalesOrderPaymentReport } from '../../utils/mockData'
+import { getSalesOrderPaymentReport } from '../../services/analyticsApi'
 import { SalesOrderPaymentReportRow, SalesOrderPaymentStatus } from './types'
 
 const statusColorMap: Record<SalesOrderPaymentStatus, string> = {

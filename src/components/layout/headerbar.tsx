@@ -1,5 +1,5 @@
 import { Layout, Switch, Dropdown, Avatar, Button, Tooltip } from 'antd';
-import { GithubOutlined, LogoutOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, BgColorsOutlined } from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, BgColorsOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import useConfigStore from '../../store/config';
 import useUserStore from '../../store/user';
@@ -169,14 +169,6 @@ const Headerbar = (props: HeaderbarProps) => {
               </div>
             </Dropdown>
           )}
-          <GithubOutlined 
-            style={{ 
-              fontSize: isMobile ? 20 : 24, 
-              cursor: 'pointer',
-              flexShrink: 0,
-            }} 
-            onClick={() => window.open('https://github.com/larry-xue/react-admin-dashboard')} 
-          />
         </div>
       </div>
       <ThemeConfigDialog

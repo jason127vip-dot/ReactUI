@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { DatePicker, InputNumber, Modal, Select, Space, Table, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs, { Dayjs } from 'dayjs'
-import { getAvailableSalesOrdersForOutbound, getOutboundLinesForOrder } from '../../../utils/mockData'
+import { getAvailableSalesOrdersForOutbound, getOutboundLinesForOrder } from '../../../services/salesDocumentApi'
 import { SalesOrder } from '../../sales-orders/types'
 import { SalesOutbound, SalesOutboundLine } from '../types'
 

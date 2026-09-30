@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DatePicker, Descriptions, Input, InputNumber, Modal, Select, Space, message } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
-import { getPaymentOrderSummaries } from '../../../utils/mockData'
+import { getPaymentOrderSummaries } from '../../../services/salesDocumentApi'
 import { Payment, PaymentOrderSummary } from '../types'
 
 interface PaymentFormProps {
