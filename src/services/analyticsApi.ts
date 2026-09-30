@@ -8,14 +8,20 @@ export interface DashboardStats {
   receivedAmount: number
   unpaidAmount: number
   outboundQuantity: number
-  recentActivities: Array<{ id: string; actor: string; summary: string; timestamp: string }>
+  recentSalesOrders: Array<{
+    id: string
+    orderNo: string
+    customerName: string
+    orderDate: string
+    amount: number
+    status: string
+  }>
   outstandingCustomers: Array<{ name: string; amount: number }>
-  revenueTrend: Array<{ month: string; revenue: number }>
-  sourceDistribution: Array<{ type: string; value: number }>
+  dailyOrderVolume: Array<{ date: string; count: number }>
 }
 
-type RawDashboardStats = Omit<DashboardStats, 'recentActivities'> & {
-  recentActivities: Array<{ id: number; actor: string; summary: string; timestamp: string }>
+type RawDashboardStats = Omit<DashboardStats, 'recentSalesOrders'> & {
+  recentSalesOrders: Array<Omit<DashboardStats['recentSalesOrders'][number], 'id'> & { id: number }>
 }
 
 type RawReportRow = Omit<SalesOrderPaymentReportRow, 'id' | 'paymentStatus'> & {
@@ -27,9 +33,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
   const response = await request.get<ApiResponse<RawDashboardStats>>('/dashboard')
   return {
     ...response.data,
-    recentActivities: response.data.recentActivities.map(item => ({ ...item, id: String(item.id) })),
-    revenueTrend: [],
-    sourceDistribution: [],
+    recentSalesOrders: response.data.recentSalesOrders.map(item => ({ ...item, id: String(item.id) })),
   }
 }
 
