@@ -5,6 +5,8 @@ export enum PaymentStatus {
 
 export interface Payment {
   id: string
+  salesInvoiceId?: string
+  invoiceNo?: string
   paymentNo: string
   salesOrderId: string
   orderNo: string
@@ -17,17 +19,20 @@ export interface Payment {
   createdAt: string
 }
 
-export interface PaymentOrderSummary {
+export interface PaymentInvoiceSummary {
   id: string
   orderNo: string
   customerName: string
-  orderAmount: number
+  salesOrderId: string
+  invoiceNo: string
+  invoiceAmount: number
+  legacyPaidAmount: number
   paidAmount: number
   unpaidAmount: number
 }
 
 export interface PaymentFormValues {
-  salesOrderId: string
+  salesInvoiceId: string
   paymentDate: string
   amount: number
   method: string

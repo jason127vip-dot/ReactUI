@@ -14,6 +14,7 @@ const CustomersPage = lazy(() => import('../customers'))
 const ProductsPage = lazy(() => import('../products'))
 const SalesOrdersPage = lazy(() => import('../sales-orders'))
 const SalesOutboundPage = lazy(() => import('../sales-outbound'))
+const SalesInvoicesPage = lazy(() => import('../sales-invoices'))
 const PaymentsPage = lazy(() => import('../payments'))
 const SalesOrderPaymentReportPage = lazy(() => import('../sales-order-payment-report'))
 const salesRoutes: AdminRouterItem[] = [
@@ -54,6 +55,11 @@ const salesRoutes: AdminRouterItem[] = [
           key: '/sales/deliveries',
           icon: <InboxOutlined />,
         },
+      },
+      {
+        path: 'sales-invoices',
+        element: <LazyRoute><SalesInvoicesPage /></LazyRoute>,
+        meta: { label: 'Sales Invoice', title: 'Sales Invoice', key: '/sales/sales-invoices', icon: <FileTextOutlined /> },
       },
       {
         path: 'payments',

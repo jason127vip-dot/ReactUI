@@ -120,7 +120,7 @@ const SalesOrdersPage = () => {
       await loadOrders()
     } catch (cancelError) {
       console.error(cancelError)
-      message.error('Failed to cancel sales order confirmation.')
+      message.error(cancelError && typeof cancelError === 'object' && 'message' in cancelError ? String(cancelError.message) : 'Failed to cancel sales order confirmation.')
     }
   }
 

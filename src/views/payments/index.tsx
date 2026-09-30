@@ -35,6 +35,7 @@ const PaymentsPage = () => {
       const matchesKeyword = !normalizedKeyword || [
         payment.paymentNo,
         payment.orderNo,
+        payment.invoiceNo,
         payment.customerName,
         payment.referenceNo,
       ].some(value => value?.toLowerCase().includes(normalizedKeyword))
@@ -46,7 +47,7 @@ const PaymentsPage = () => {
     })
   }, [dateRange, keyword, methodFilter, payments, statusFilter])
   const confirm = async (payment: Payment) => {
-    try { await confirmPayment(payment.id); message.success(`${payment.paymentNo} confirmed`); await loadPayments() } catch (error) { console.error(error); message.error('Failed to confirm payment.') }
+    try { await confirmPayment(payment.id); message.success(`${payment.paymentNo} confirmed`); await loadPayments() } catch (error) { console.error(error); message.error(error && typeof error === 'object' && 'message' in error ? String(error.message) : 'Failed to confirm payment.') }
   }
   const cancelConfirmation = async (payment: Payment) => {
     try { await cancelPaymentConfirmation(payment.id); message.success(`${payment.paymentNo} restored to draft`); await loadPayments() } catch (error) { console.error(error); message.error('Failed to cancel payment confirmation.') }
@@ -55,10 +56,10 @@ const PaymentsPage = () => {
     try { await deletePayment(payment.id); message.success(`${payment.paymentNo} deleted`); await loadPayments() } catch (error) { console.error(error); message.error('Failed to delete payment.') }
   }
   const columns: ColumnsType<Payment> = [
-    { title: 'Payment No.', dataIndex: 'paymentNo' }, { title: 'Sales Order', dataIndex: 'orderNo' }, { title: 'Customer', dataIndex: 'customerName' },
+    { title: 'Payment No.', dataIndex: 'paymentNo' }, { title: 'Invoice No.', dataIndex: 'invoiceNo', render: value => value || <Tag color="warning">Legacy order payment</Tag> }, { title: 'Sales Order', dataIndex: 'orderNo' }, { title: 'Customer', dataIndex: 'customerName' },
     { title: 'Payment Date', dataIndex: 'paymentDate' }, { title: 'Amount', dataIndex: 'amount', render: value => `¥${value.toLocaleString()}` }, { title: 'Method', dataIndex: 'method' },
     { title: 'Status', dataIndex: 'status', render: (status: PaymentStatus) => <Tag color={statusColorMap[status]}>{status}</Tag> },
-    { title: 'Actions', render: (_value, payment) => <Space>{payment.status === PaymentStatus.Draft && <><Button type="link" onClick={() => { setFormMode('edit'); setEditingPayment(payment); setFormVisible(true) }}>Edit</Button><Popconfirm title="Confirm this payment?" okText="Confirm payment" cancelText="Cancel" onConfirm={() => confirm(payment)}><Button type="link">Confirm</Button></Popconfirm><Popconfirm title="Delete this payment?" okText="Delete payment" cancelText="Cancel" okButtonProps={{ danger: true }} onConfirm={() => remove(payment)}><Button type="link" danger>Delete</Button></Popconfirm></>}{payment.status === PaymentStatus.Confirmed && <Popconfirm title="Cancel payment confirmation?" description="The payment amount will be released." okText="Cancel confirmation" cancelText="Keep confirmed" onConfirm={() => cancelConfirmation(payment)}><Button type="link">Cancel Confirmation</Button></Popconfirm>}</Space> },
+    { title: 'Actions', render: (_value, payment) => <Space>{payment.status === PaymentStatus.Draft && <><Button type="link" onClick={() => { setFormMode('edit'); setEditingPayment(payment); setFormVisible(true) }}>Edit</Button><Popconfirm title="Confirm this payment?" okText="Confirm payment" cancelText="Cancel" onConfirm={() => confirm(payment)}><Button type="link" disabled={!payment.salesInvoiceId}>Confirm</Button></Popconfirm><Popconfirm title="Delete this payment?" okText="Delete payment" cancelText="Cancel" okButtonProps={{ danger: true }} onConfirm={() => remove(payment)}><Button type="link" danger>Delete</Button></Popconfirm></>}{payment.status === PaymentStatus.Confirmed && <Popconfirm title="Cancel payment confirmation?" description="The payment amount will be released." okText="Cancel confirmation" cancelText="Keep confirmed" onConfirm={() => cancelConfirmation(payment)}><Button type="link">Cancel Confirmation</Button></Popconfirm>}</Space> },
   ]
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -67,10 +68,11 @@ const PaymentsPage = () => {
         extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => { setFormMode('create'); setEditingPayment(undefined); setFormVisible(true) }}>New Payment</Button>}
       >
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          {payments.some(payment => !payment.salesInvoiceId) && <Alert type="warning" showIcon title="Legacy order payments" description="These payments are preserved in order totals. To assign them to invoices, cancel confirmation, edit and select a confirmed invoice from the same order, then confirm again. All confirmed legacy payments on that order must be assigned before invoice payments can be confirmed." />}
           <Space wrap>
             <Input.Search
               allowClear
-              placeholder="Payment no., sales order, customer or reference"
+              placeholder="Payment, invoice, order, customer or reference"
               value={keyword}
               onChange={event => setKeyword(event.target.value)}
               style={{ width: 350 }}
@@ -134,7 +136,7 @@ const PaymentsPage = () => {
             await loadPayments()
           } catch (error) {
             console.error(error)
-            message.error('Failed to save payment.')
+            message.error(error && typeof error === 'object' && 'message' in error ? String(error.message) : 'Failed to save payment.')
           }
         }}
       />

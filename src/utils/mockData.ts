@@ -2,9 +2,13 @@ import { Customer, CustomerActivity, CustomerFormValues, CustomerSource, Custome
 import { Product, ProductFormValues, ProductStatus } from '../views/products/types'
 import { SalesOrder, SalesOrderFormValues, SalesOrderStatus } from '../views/sales-orders/types'
 import { SalesOutbound, SalesOutboundFormValues, SalesOutboundLine, SalesOutboundStatus } from '../views/sales-outbound/types'
-import { Payment, PaymentFormValues, PaymentOrderSummary, PaymentStatus } from '../views/payments/types'
+import { Payment, PaymentStatus } from '../views/payments/types'
 import { SalesOrderPaymentReportRow, SalesOrderPaymentStatus } from '../views/sales-order-payment-report/types'
 import type { Role, RoleDetail, Permission, RoleFormValues } from '../views/team/types'
+
+// Retain the original order-based mock fixtures; live payments use the invoice API.
+type PaymentFormValues = Pick<Payment, 'salesOrderId' | 'paymentDate' | 'amount' | 'method' | 'referenceNo'>
+type PaymentOrderSummary = { id: string; orderNo: string; customerName: string; orderAmount: number; paidAmount: number; unpaidAmount: number }
 
 const sleep = (delay = 320) => new Promise(resolve => setTimeout(resolve, delay))
 
