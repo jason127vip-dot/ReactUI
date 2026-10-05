@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 import { Outlet } from 'react-router-dom';
-import { Card } from 'antd';
+import { Alert, Button, Card, Spin } from 'antd';
+import useBranchStore from '../../store/branch';
 
 // Custom hook for responsive breakpoints
 const useResponsive = () => {
@@ -24,6 +25,7 @@ const useResponsive = () => {
 
 const PageContent: React.FC = () => {
   const { isMobile, isTablet } = useResponsive()
+  const { branchId, ready, error, load } = useBranchStore()
 
   return (
     <div style={{ 
@@ -34,7 +36,7 @@ const PageContent: React.FC = () => {
         minHeight: "100%",
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
       }}>
-        <Outlet />
+        {error ? <Alert type="error" showIcon message={error} action={<Button onClick={() => { void load() }}>Retry</Button>} /> : ready ? <Outlet key={branchId} /> : <Spin tip="Loading branches"><div style={{ minHeight: 120 }} /></Spin>}
       </Card>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Card, DatePicker, Empty, Input, Popconfirm, Select, Space, Table, Tag, message } from 'antd'
+import { Alert, Button, Card, DatePicker, Empty, Input, Modal, Popconfirm, Select, Space, Table, Tag, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { Dayjs } from 'dayjs'
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons'
@@ -37,6 +37,28 @@ const paymentStatusOptions = {
   partially_paid: { label: 'Partially Paid', color: 'warning' },
   paid: { label: 'Paid', color: 'success' },
 } as const
+
+const errorMessage = (error: unknown, fallback: string) => error && typeof error === 'object' && 'message' in error ? String(error.message) : fallback
+
+const showCreditWarning = (warning: string) => {
+  Modal.warning({
+    title: 'Credit Warning',
+    content: <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{warning}</div>,
+    centered: true,
+    width: 620,
+    okText: 'OK',
+  })
+}
+
+const showConfirmError = (error: unknown) => {
+  Modal.error({
+    title: 'Unable to Confirm Order',
+    content: <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{errorMessage(error, 'Failed to confirm sales order.')}</div>,
+    centered: true,
+    width: 620,
+    okText: 'OK',
+  })
+}
 
 const SalesOrdersPage = () => {
   const [orders, setOrders] = useState<SalesOrder[]>([])
@@ -98,7 +120,7 @@ const SalesOrdersPage = () => {
       await loadOrders()
     } catch (confirmError) {
       console.error(confirmError)
-      message.error('Failed to confirm sales order.')
+      showConfirmError(confirmError)
     }
   }
 
@@ -292,18 +314,20 @@ const SalesOrdersPage = () => {
         onSubmit={async values => {
           try {
             if (formMode === 'create') {
-              await createSalesOrder(values)
+              const order = await createSalesOrder(values)
               message.success('Sales order created successfully')
+              if (order.creditWarning) showCreditWarning(order.creditWarning)
             } else if (editingOrder) {
-              await updateSalesOrder(editingOrder.id, values)
+              const order = await updateSalesOrder(editingOrder.id, values)
               message.success('Sales order updated')
+              if (order.creditWarning) showCreditWarning(order.creditWarning)
             }
             setFormVisible(false)
             setEditingOrder(undefined)
             await loadOrders()
           } catch (saveError) {
             console.error(saveError)
-            message.error('Failed to create sales order. Please try again later.')
+            message.error(errorMessage(saveError, 'Failed to save sales order. Please try again later.'))
           }
         }}
       />

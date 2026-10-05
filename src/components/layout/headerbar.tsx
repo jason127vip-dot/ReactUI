@@ -6,6 +6,7 @@ import useUserStore from '../../store/user';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import ThemeConfigDialog from './ThemeConfigDialog';
+import BranchSelector from './BranchSelector';
 const { Header } = Layout;
 
 // Custom hook for responsive breakpoints
@@ -120,6 +121,7 @@ const Headerbar = (props: HeaderbarProps) => {
           gap: isMobile ? 6 : 10,
           flexShrink: 0,
         }}>
+          <BranchSelector mobile={isMobile} />
           {!isMobile && (
             <>
               <Switch 

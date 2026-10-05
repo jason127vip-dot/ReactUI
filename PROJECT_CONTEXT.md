@@ -39,6 +39,29 @@ Both active repositories were clean before this context document was added. The 
 
 ## 3. Completed frontend features
 
+### Branches (2026-10-06)
+
+- Header branch selector remembers the selected branch in local storage. Switching remounts the content to discard open document forms and refresh data.
+- Master Data / Branches supports creating and editing branch codes and names. Branch deletion is not offered.
+- Customer and product masters remain shared. Orders belong to a branch; outbounds, invoices, and payments inherit branch ownership through their sales order.
+- Sales lists, source selection, payment reports, and Dashboard are scoped to the selected branch. Backend document mutations validate order ownership.
+- Business API requests require `X-Branch-ID`; branch and shared-master endpoints do not.
+- On the next backend start, AutoMigrate creates the default Main Branch and assigns existing orders to branch ID 1. No database migration or backend start was performed for this change.
+- Price lists remain a separate future step.
+- New document numbers include the branch code and use a separate yearly sequence per branch, for example `SO-AKL-2026-0001`, `OUT-AKL-2026-0001`, `INV-AKL-2026-0001`, and `PAY-AKL-2026-0001`. Existing document numbers are retained.
+- Branch codes are normalized to uppercase letters/numbers, limited to 20 characters, and cannot be changed after the branch has sales orders.
+
+### Credit control (2026-10-06)
+
+- Each branch has an enable switch and total credit limit. Customer allocations for the branch cannot exceed that total.
+- Master Data / Credit Control shows every shared customer with that branch's credit limit, confirmed-order exposure, available credit, and status.
+- Used credit is the branch/customer's confirmed sales order total minus confirmed payments, floored at zero. The same customer is calculated independently in each branch.
+- Saving or editing a draft never reserves credit. An over-limit draft is saved with a warning.
+- Confirming a sales order rechecks available credit inside a transaction. It locks the branch and branch/customer credit rows so concurrent confirmations in the same branch cannot consume the same availability.
+- Cancelling order confirmation releases exposure. Confirmed payments reduce exposure; cancelling payment confirmation restores it and may leave the customer exceeded, but does not block the accounting correction.
+- When credit control is disabled, usage is still calculated but sales order confirmation is not blocked.
+- The next backend start uses AutoMigrate to add branch credit fields and create `branch_customer_credits`. This change did not start the backend or migrate the application database.
+
 ### Application shell and branding
 
 - Header title: **Sales Management System (Brunton ERP)**.
@@ -290,3 +313,12 @@ At the end of the last work session, frontend lint/build and backend build/vet p
 - Tests cover invoice source quantities, snapshots, rounding, invalid payment values, request validation, and business-error responses. Database lifecycle and concurrency still need integration verification after an authorized backend start.
 
 - Validation completed: frontend lint and production build, Go build/vet/unit tests, and whitespace checks. Browser checks verified the invoice route, source-load error state and sample invoice detail. The native print dialog and database-backed end-to-end flow were not verified.
+
+## 12. Branch sales price lists (2026-10-06)
+
+- Sales prices are maintained under Master Data > Sales Price Lists and belong to the branch selected in the header.
+- A price is matched by branch, customer, product, and the sales order date. Start and end dates are inclusive.
+- Date ranges for the same branch/customer/product cannot overlap. If no matching row exists, the product master unit price is used.
+- Selecting a product loads its effective price. Changing the order customer or order date refreshes prices for the current lines. Unit prices remain editable and the saved order line keeps the final price as a historical snapshot.
+- API endpoints: `GET/POST /api/price-lists`, `PUT/DELETE /api/price-lists/:id`, and `GET /api/price-lists/resolve?customerId=...&productId=...&date=YYYY-MM-DD`.
+- The next backend start runs AutoMigrate to create `price_lists`. Database-backed end-to-end validation has not yet been run.

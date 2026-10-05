@@ -11,6 +11,9 @@ import type { AdminRouterItem } from '../../router'
 import LazyRoute from '../../components/common/LazyRoute'
 
 const CustomersPage = lazy(() => import('../customers'))
+const BranchesPage = lazy(() => import('../branches'))
+const CreditControlPage = lazy(() => import('../credit-control'))
+const PriceListsPage = lazy(() => import('../price-lists'))
 const ProductsPage = lazy(() => import('../products'))
 const SalesOrdersPage = lazy(() => import('../sales-orders'))
 const SalesOutboundPage = lazy(() => import('../sales-outbound'))
@@ -87,6 +90,21 @@ const salesRoutes: AdminRouterItem[] = [
       order: 3,
     },
     children: [
+      {
+        path: 'branches',
+        element: <LazyRoute><BranchesPage /></LazyRoute>,
+        meta: { label: 'Branches', title: 'Branches', key: '/master-data/branches' },
+      },
+      {
+        path: 'credit-control',
+        element: <LazyRoute><CreditControlPage /></LazyRoute>,
+        meta: { label: 'Credit Control', title: 'Credit Control', key: '/master-data/credit-control' },
+      },
+      {
+        path: 'price-lists',
+        element: <LazyRoute><PriceListsPage /></LazyRoute>,
+        meta: { label: 'Sales Price Lists', title: 'Sales Price Lists', key: '/master-data/price-lists' },
+      },
       {
         path: 'customers',
         element: (

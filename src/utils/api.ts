@@ -18,6 +18,8 @@ api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Get token from localStorage
     const token = localStorage.getItem('token')
+    const branchId = localStorage.getItem('branchId')
+    if (branchId) config.headers['X-Branch-ID'] = branchId
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
     }

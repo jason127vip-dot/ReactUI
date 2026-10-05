@@ -20,6 +20,7 @@ type ApiSalesOrder = {
   paymentStatus: string
   paidAmount: number
   unpaidAmount: number
+  creditWarning?: string
   lines: Array<Omit<SalesOrderLine, 'id' | 'productId'> & { id: number; productId: number }>
   createdAt: string
 }
@@ -41,6 +42,7 @@ const toOrder = (order: ApiSalesOrder): SalesOrder => ({
   paymentStatus: order.paymentStatus as SalesOrderPaymentStatus,
   paidAmount: order.paidAmount,
   unpaidAmount: order.unpaidAmount,
+  creditWarning: order.creditWarning,
   lines: order.lines.map(line => ({ ...line, id: String(line.id), productId: String(line.productId) })),
   createdAt: order.createdAt,
 })
@@ -52,7 +54,7 @@ const payload = (values: SalesOrderFormValues) => ({
   expectedOutboundDate: values.expectedOutboundDate,
   salesperson: values.salesperson,
   remarks: values.remarks,
-  lines: values.lines.map(line => ({ productId: Number(line.productId), quantity: line.quantity })),
+  lines: values.lines.map(line => ({ productId: Number(line.productId), unitPrice: line.unitPrice, quantity: line.quantity })),
 })
 
 export const getSalesOrders = async (): Promise<SalesOrder[]> => {

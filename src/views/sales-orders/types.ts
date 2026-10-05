@@ -36,6 +36,7 @@ export interface SalesOrder {
   paymentStatus?: SalesOrderPaymentStatus
   paidAmount?: number
   unpaidAmount?: number
+  creditWarning?: string
   lines: SalesOrderLine[]
   createdAt: string
 }

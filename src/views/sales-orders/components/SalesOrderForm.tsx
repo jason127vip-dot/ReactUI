@@ -4,6 +4,7 @@ import { DeleteOutlined, ScanOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs, { Dayjs } from 'dayjs'
 import { getCustomers, getProducts } from '../../../services/masterDataApi'
+import { resolveSalesPrice } from '../../../services/priceListApi'
 import { Customer, CustomerStatus } from '../../customers/types'
 import { Product, ProductStatus } from '../../products/types'
 import { SalesOrder, SalesOrderFormValues, SalesOrderLine } from '../types'
@@ -16,7 +17,7 @@ interface SalesOrderFormProps {
   onSubmit: (values: SalesOrderFormValues) => Promise<void> | void
 }
 
-const productToLine = (product: Product): SalesOrderLine => ({
+const productToLine = (product: Product, unitPrice: number): SalesOrderLine => ({
   id: `${product.id}-${Date.now()}`,
   productId: product.id,
   productCode: product.productCode,
@@ -24,9 +25,9 @@ const productToLine = (product: Product): SalesOrderLine => ({
   productName: product.name,
   specification: product.specification,
   unit: product.unit,
-  unitPrice: product.unitPrice,
+  unitPrice,
   quantity: 1,
-  amount: product.unitPrice,
+  amount: unitPrice,
 })
 
 const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesOrderFormProps) => {
@@ -88,10 +89,16 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
     setLines([])
   }
 
-  const addProduct = (product: Product) => {
+  const getPrice = async (product: Product, nextCustomerId = customerId, nextOrderDate = orderDate) => {
+    if (!nextCustomerId) return product.unitPrice
+    return (await resolveSalesPrice(nextCustomerId, product.id, nextOrderDate.format('YYYY-MM-DD'))).unitPrice
+  }
+
+  const addProduct = async (product: Product) => {
+    const unitPrice = await getPrice(product)
     setLines(current => {
       const existing = current.find(line => line.productId === product.id)
-      if (!existing) return [...current, productToLine(product)]
+      if (!existing) return [...current, productToLine(product, unitPrice)]
       return current.map(line => line.productId === product.id
         ? { ...line, quantity: line.quantity + 1, amount: (line.quantity + 1) * line.unitPrice }
         : line,
@@ -114,7 +121,7 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
         message.warning(`No active product matches "${value}".`)
         return
       }
-      addProduct(product)
+      await addProduct(product)
       setScanValue('')
       message.success(`${product.name} added to the order`)
     } catch (error) {
@@ -125,13 +132,14 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
     }
   }
 
-  const handleManualProductAdd = () => {
+  const handleManualProductAdd = async () => {
     const product = products.find(item => item.id === selectedProductId)
     if (!product) {
       message.warning('Select a product to add.')
       return
     }
-    addProduct(product)
+    try { await addProduct(product) }
+    catch (error) { console.error(error); message.error('Unable to load the sales price.') }
     setSelectedProductId(undefined)
   }
 
@@ -141,6 +149,24 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
       ? { ...line, quantity: nextQuantity, amount: nextQuantity * line.unitPrice }
       : line,
     ))
+  }
+
+  const updateUnitPrice = (lineId: string, unitPrice: number | null) => {
+    const nextPrice = unitPrice ?? 0
+    setLines(current => current.map(line => line.id === lineId ? { ...line, unitPrice: nextPrice, amount: nextPrice * line.quantity } : line))
+  }
+
+  const repriceLines = async (nextCustomerId: string | undefined, nextOrderDate: Dayjs) => {
+    if (!nextCustomerId || lines.length === 0) return
+    try {
+      const nextLines = await Promise.all(lines.map(async line => {
+        const product = products.find(item => item.id === line.productId)
+        if (!product) return line
+        const unitPrice = await getPrice(product, nextCustomerId, nextOrderDate)
+        return { ...line, unitPrice, amount: unitPrice * line.quantity }
+      }))
+      setLines(nextLines)
+    } catch (error) { console.error(error); message.error('Unable to refresh sales prices.') }
   }
 
   const totalAmount = useMemo(
@@ -186,7 +212,7 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
       ),
     },
     { title: 'Unit', dataIndex: 'unit' },
-    { title: 'Unit Price', dataIndex: 'unitPrice', render: value => `$${value.toLocaleString()}` },
+    { title: 'Unit Price', dataIndex: 'unitPrice', render: (value, line) => <InputNumber min={0} precision={2} prefix="$" value={value} onChange={next => updateUnitPrice(line.id, next)} /> },
     {
       title: 'Quantity',
       dataIndex: 'quantity',
@@ -222,11 +248,11 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
             placeholder="Select customer"
             loading={loadingCustomers}
             value={customerId}
-            onChange={setCustomerId}
+            onChange={value => { setCustomerId(value); void repriceLines(value, orderDate) }}
             style={{ width: 300 }}
             options={customers.map(customer => ({ label: `${customer.customerCode} · ${customer.name}`, value: customer.id }))}
           />
-          <DatePicker value={orderDate} onChange={value => setOrderDate(value ?? dayjs())} />
+          <DatePicker value={orderDate} onChange={value => { const next = value ?? dayjs(); setOrderDate(next); void repriceLines(customerId, next) }} />
           <Input
             placeholder="Customer PO No."
             value={customerPoNo}
@@ -282,7 +308,7 @@ const SalesOrderForm = ({ mode, open, initialOrder, onCancel, onSubmit }: SalesO
               value: product.id,
             }))}
           />
-          <Button onClick={handleManualProductAdd}>Add Product</Button>
+          <Button onClick={() => { void handleManualProductAdd() }}>Add Product</Button>
         </Space.Compact>
 
         <Table
