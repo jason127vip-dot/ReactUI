@@ -20,6 +20,21 @@ export interface DashboardStats {
   dailyOrderVolume: Array<{ date: string; count: number }>
 }
 
+export type ARAgingBucket = '0-30 Days' | '31-60 Days' | '61-90 Days' | '91-120 Days' | '120+ Days'
+
+export interface ARAgingReportRow {
+  id: string
+  invoiceNo: string
+  orderNo: string
+  customerName: string
+  invoiceDate: string
+  invoiceAmount: number
+  paidAmount: number
+  outstandingAmount: number
+  agingDays: number
+  agingBucket: ARAgingBucket
+}
+
 type RawDashboardStats = Omit<DashboardStats, 'recentSalesOrders'> & {
   recentSalesOrders: Array<Omit<DashboardStats['recentSalesOrders'][number], 'id'> & { id: number }>
 }
@@ -40,4 +55,9 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
 export const getSalesOrderPaymentReport = async (): Promise<SalesOrderPaymentReportRow[]> => {
   const response = await request.get<ApiResponse<RawReportRow[]>>('/reports/sales-order-payments')
   return response.data.map(row => ({ ...row, id: String(row.id), paymentStatus: row.paymentStatus as SalesOrderPaymentStatus }))
+}
+
+export const getARAgingReport = async (): Promise<ARAgingReportRow[]> => {
+  const response = await request.get<ApiResponse<Array<Omit<ARAgingReportRow, 'id'> & { id: number }>>>('/reports/ar-aging')
+  return response.data.map(row => ({ ...row, id: String(row.id) }))
 }

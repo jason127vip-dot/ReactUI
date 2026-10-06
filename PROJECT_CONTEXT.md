@@ -322,3 +322,11 @@ At the end of the last work session, frontend lint/build and backend build/vet p
 - Selecting a product loads its effective price. Changing the order customer or order date refreshes prices for the current lines. Unit prices remain editable and the saved order line keeps the final price as a historical snapshot.
 - API endpoints: `GET/POST /api/price-lists`, `PUT/DELETE /api/price-lists/:id`, and `GET /api/price-lists/resolve?customerId=...&productId=...&date=YYYY-MM-DD`.
 - The next backend start runs AutoMigrate to create `price_lists`. Database-backed end-to-end validation has not yet been run.
+
+## 13. AR aging report (2026-10-06)
+
+- Reports > AR Aging Report shows confirmed invoices with an outstanding balance for the selected branch.
+- Aging days are calculated as the server's current calendar date minus the invoice date; future-dated invoices are treated as zero days.
+- Buckets are `0-30 Days`, `31-60 Days`, `61-90 Days`, `91-120 Days`, and `120+ Days`.
+- The report includes invoice/order/customer references, invoice amount, confirmed invoice-linked payments, outstanding amount, aging days and bucket, with filters and visible-row totals.
+- API endpoint: `GET /api/reports/ar-aging`. No database schema change is required.

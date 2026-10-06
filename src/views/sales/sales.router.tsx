@@ -20,6 +20,7 @@ const SalesOutboundPage = lazy(() => import('../sales-outbound'))
 const SalesInvoicesPage = lazy(() => import('../sales-invoices'))
 const PaymentsPage = lazy(() => import('../payments'))
 const SalesOrderPaymentReportPage = lazy(() => import('../sales-order-payment-report'))
+const ARAgingReportPage = lazy(() => import('../ar-aging-report'))
 const salesRoutes: AdminRouterItem[] = [
   {
     path: 'sales',
@@ -143,6 +144,11 @@ const salesRoutes: AdminRouterItem[] = [
       order: 4,
     },
     children: [
+      {
+        path: 'ar-aging',
+        element: <LazyRoute><ARAgingReportPage /></LazyRoute>,
+        meta: { label: 'AR Aging Report', title: 'AR Aging Report', key: '/reports/ar-aging' },
+      },
       {
         path: 'sales-order-payment-report',
         element: (
