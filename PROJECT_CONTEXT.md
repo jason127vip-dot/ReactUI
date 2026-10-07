@@ -330,3 +330,11 @@ At the end of the last work session, frontend lint/build and backend build/vet p
 - Buckets are `0-30 Days`, `31-60 Days`, `61-90 Days`, `91-120 Days`, and `120+ Days`.
 - The report includes invoice/order/customer references, invoice amount, confirmed invoice-linked payments, outstanding amount, aging days and bucket, with filters and visible-row totals.
 - API endpoint: `GET /api/reports/ar-aging`. No database schema change is required.
+
+## 14. AI order review (2026-10-07)
+
+- Draft Sales Orders now have an **AI Review** action beside Confirm. It opens a drawer with the order amount, branch/customer credit position, projected exposure, outstanding invoice aging, deterministic risk reasons, a recommendation, suggested questions, and a short chat history.
+- `POST /api/sales-orders/:id/ai-review` reloads all business facts from the database for the selected branch. The frontend never supplies credit facts or the order amount.
+- Risk is determined by Go rules: over-limit orders are High and fail the existing credit rule; within-limit orders with outstanding invoices older than 30 days are Medium; other within-limit orders are Low. Disabled credit control is Informational.
+- Without `OPENAI_API_KEY`, the endpoint returns local demo responses with `source: mock`. With a key, it calls the OpenAI Responses API using `OPENAI_MODEL` (default `gpt-6-luna`), structured JSON output, a 15-second timeout, and `store: false`. OpenAI failures fall back to the local response and set `aiUnavailable`.
+- No schema migration is required. The Go service was not started and no real OpenAI request was made because API credits were not yet available.

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, DatePicker, Empty, Input, Modal, Popconfirm, Select, Space, Table, Tag, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { Dayjs } from 'dayjs'
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons'
+import { PlusOutlined, ReloadOutlined, RobotOutlined } from '@ant-design/icons'
 import {
   cancelSalesOrderConfirmation,
   confirmSalesOrder,
@@ -14,6 +14,7 @@ import {
 import SalesOrderDetail from './components/SalesOrderDetail'
 import SalesOrderExecution from './components/SalesOrderExecution'
 import SalesOrderForm from './components/SalesOrderForm'
+import SalesOrderAIReview from './components/SalesOrderAIReview'
 import {
   SalesOrder,
   SalesOrderOutboundStatus,
@@ -70,6 +71,7 @@ const SalesOrdersPage = () => {
   const [detailVisible, setDetailVisible] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<SalesOrder>()
   const [executionVisible, setExecutionVisible] = useState(false)
+  const [reviewOrder, setReviewOrder] = useState<SalesOrder>()
   const [keyword, setKeyword] = useState('')
   const [statusFilter, setStatusFilter] = useState<SalesOrderStatus>()
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null)
@@ -184,7 +186,7 @@ const SalesOrdersPage = () => {
     {
       title: 'Actions',
       key: 'actions',
-      width: 255,
+      width: 335,
       render: (_value, order) => (
         <Space size={0}>
           <Button type="link" style={{ paddingInline: 8 }} onClick={() => {
@@ -201,6 +203,9 @@ const SalesOrdersPage = () => {
                 setFormVisible(true)
               }}>
                 Edit
+              </Button>
+              <Button type="link" icon={<RobotOutlined />} style={{ paddingInline: 8 }} onClick={() => setReviewOrder(order)}>
+                AI Review
               </Button>
               <Popconfirm
                 title="Confirm this sales order?"
@@ -333,6 +338,7 @@ const SalesOrdersPage = () => {
       />
       <SalesOrderDetail order={selectedOrder} open={detailVisible} onClose={() => setDetailVisible(false)} />
       <SalesOrderExecution order={selectedOrder} open={executionVisible} onClose={() => setExecutionVisible(false)} />
+      <SalesOrderAIReview order={reviewOrder} open={Boolean(reviewOrder)} onClose={() => setReviewOrder(undefined)} />
     </Space>
   )
 }
